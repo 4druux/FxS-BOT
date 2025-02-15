@@ -1,0 +1,64 @@
+@import url("https://fonts.googleapis.com/css2?family=Prata&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #121212;
+}
+
+.prata-regular {
+  font-family: "Prata", sans-serif;
+  font-style: normal;
+}
+
+.manrope-regular {
+  font-family: "Manrope", sans-serif;
+  font-style: normal;
+  letter-spacing: 0.4rem;
+}
+
+/* Untuk memastikan scrollbar juga dark mode */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #121212;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
+@keyframes borderMove {
+  0% {
+    stroke-dashoffset: 800;
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0.2;
+  }
+}
+
+.neon-border {
+  animation: borderMove 2s linear infinite;
+  filter: drop-shadow(4px 4px 16px cyan);
+}
+
+/*style tambahan transisi border*/
+.border-neutral-800 {
+  transition: border-color 0.3s ease; /* Transisi untuk perubahan warna border */
+}
