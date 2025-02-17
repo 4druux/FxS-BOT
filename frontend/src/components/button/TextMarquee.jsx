@@ -7,7 +7,7 @@ const TextMarquee = () => {
       [mask-image:linear-gradient(to_right,rgba(0,0,0,0)_5%,rgba(0,0,0,1)_30%,rgba(0,0,0,1)_70%,rgba(0,0,0,0)_95%)]"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-[#121212] pointer-events-none"></div>
+      <div className="absolute inset-0  pointer-events-none"></div>
 
       {/* Marquee Wrapper */}
       <div className="flex w-max animate-marquee items-center space-x-8">

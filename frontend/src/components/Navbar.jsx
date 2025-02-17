@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { assets } from "../assets/assets";
-import ShinyBorder from "./ShinyBorder";
+import ShinyBorder from "./button/ShinyBorder";
 
 const Navbar = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -109,7 +109,7 @@ const Navbar = () => {
                 text="FxS"
                 disabled={false}
                 speed={3}
-                className="transition-all duration-500"
+                className="transition-all duration-500 font-bold"
               />
             </div>
           </div>

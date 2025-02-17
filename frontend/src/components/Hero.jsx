@@ -1,11 +1,11 @@
-import SplitText from "./SplitText";
-import ShapeBlur from "./ShapeBlur";
-import TrueFocus from "./TrueFocus";
+import SplitText from "./button/SplitText";
+// import ShapeBlur from "./ShapeBlur";
+import TrueFocus from "./button/TrueFocus";
 
 const Hero = () => {
   return (
     <div className="sm:px-[6vw] md:px-[9vw] lg:px-[10vw] px-4 py-6">
-      <div
+      {/* <div
         className="mb-4"
         style={{ position: "relative", height: "380px", overflow: "hidden" }}
       >
@@ -18,8 +18,8 @@ const Hero = () => {
           circleSize={0.25}
           circleEdge={1.0}
         />
-      </div>
-      <div className="mb-4" style={{ position: "relative", height: "150px" }}>
+      </div> */}
+      <div className="mb-4" style={{ position: "relative", height: "80px" }}>
         <SplitText
           text="Welcome to FxS Store"
           flex={true}
@@ -31,15 +31,15 @@ const Hero = () => {
           textColor="#b5b5b5a4"
           strokeColor="#ff0000"
           minFontSize={24}
-          className=""
+          className="px-auto md:px-32"
         />
       </div>
       <TrueFocus
         sentence="The highes quality tools"
-        manualMode={true}
+        manualMode={false}
         blurAmount={5}
         borderColor="teal"
-        animationDuration={0.6}
+        animationDuration={1.5}
         pauseBetweenAnimations={0}
       />
     </div>

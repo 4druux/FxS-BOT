@@ -60,20 +60,15 @@ const TrueFocus = ({
     });
   }, [currentIndex, words.length]);
 
-  // Handle hover
   const handleMouseEnter = (index) => {
     setIsHovered(true);
-    clearInterval(animationInterval.current); // Hentikan animasi
-    if (manualMode) {
-      setCurrentIndex(index);
-    }
+    clearInterval(animationInterval.current); // Hentikan animasi otomatis
+    setCurrentIndex(index); // Langsung update ke kata yang di-hover
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-    //jangan memulai ulang animasi jika mode manual
     if (!manualMode) {
-      setCurrentIndex((prev) => (prev + 1) % words.length);
       animationInterval.current = setInterval(() => {
         setCurrentIndex((prev) => (prev + 1) % words.length);
       }, (animationDuration + pauseBetweenAnimations) * 1000);

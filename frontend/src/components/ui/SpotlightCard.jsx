@@ -32,7 +32,7 @@ const SpotlightCard = ({
         setIsHovered(false); // Set isHovered menjadi false
         setOpacity(0);
       }}
-      className={`relative rounded-3xl border border-neutral-800 bg-neutral-900 overflow-hidden p-8 ${className}`}
+      className={`relative rounded-3xl border border-neutral-800 bg-neutral-900 overflow-hidden p-4 ${className}`}
     >
       {/* Background Spotlight */}
       <div

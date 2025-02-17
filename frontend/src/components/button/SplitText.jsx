@@ -19,7 +19,7 @@ const SplitText = ({
   strokeColor = "#FF0000",
   className = "",
 
-  minFontSize = 24,
+  minFontSize = 12,
   strokeWidth = 2,
 }) => {
   const containerRef = useRef(null);
@@ -72,13 +72,18 @@ const SplitText = ({
 
   const setSize = useCallback(() => {
     if (!containerRef.current || !titleRef.current) return;
+
     const { width: containerW, height: containerH } =
       containerRef.current.getBoundingClientRect();
-    let newFontSize = containerW / (chars.length / 2);
-    newFontSize = Math.max(newFontSize, minFontSize);
+
+    let newFontSize = containerW / (chars.length / 1); // Perbaiki rasio ukuran
+    newFontSize = Math.max(newFontSize, minFontSize); // Pastikan tidak terlalu kecil
+    newFontSize = Math.min(newFontSize, 70); // Tambahkan batas maksimal ukuran
+
     setFontSize(newFontSize);
     setScaleY(1);
     setLineHeight(1);
+
     requestAnimationFrame(() => {
       if (!titleRef.current) return;
       const textRect = titleRef.current.getBoundingClientRect();

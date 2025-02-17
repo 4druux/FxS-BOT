@@ -1,8 +1,9 @@
-import SpotlightCard from "./SpotlightCard";
+import SpotlightCard from "./ui/SpotlightCard";
 import { motion } from "framer-motion";
 import { FaShoppingCart } from "react-icons/fa";
-import ShinyText from "./ShinyText";
+import ShinyText from "./button/ShinyText";
 import { Sparkle } from "lucide-react";
+import { assets } from "../assets/assets";
 
 const CardProduct = () => {
   const products = [
@@ -10,42 +11,42 @@ const CardProduct = () => {
       id: 1,
       title: "Product 1",
       description: "Description 1",
-      imageUrl: "/placeholder-image.jpg",
+      image: assets.tes_1,
       price: "$19.99",
     },
     {
       id: 2,
       title: "Product 2",
       description: "Description 2",
-      imageUrl: "/placeholder-image.jpg",
+      image: assets.tes_1,
       price: "$24.99",
     },
     {
       id: 3,
       title: "Product 3",
       description: "Description 3",
-      imageUrl: "/placeholder-image.jpg",
+      image: assets.tes_1,
       price: "$29.99",
     },
     {
       id: 4,
       title: "Product 4",
       description: "Description 4",
-      imageUrl: "/placeholder-image.jpg",
+      image: assets.tes_1,
       price: "$34.99",
     },
     {
       id: 5,
       title: "Product 5",
       description: "Description 5",
-      imageUrl: "/placeholder-image.jpg",
+      image: assets.tes_1,
       price: "$39.99",
     },
     {
       id: 6,
       title: "Product 6",
       description: "Description 6",
-      imageUrl: "/placeholder-image.jpg",
+      image: assets.tes_1,
       price: "$44.99",
     },
   ];
@@ -91,9 +92,9 @@ const CardProduct = () => {
               spotlightColor="rgba(0, 229, 255, 0.2)"
             >
               <img
-                src={product.imageUrl}
+                src={product.image}
                 alt={product.title}
-                className="w-full h-48 object-cover rounded-t-3xl"
+                className="w-full h-60 object-cover rounded-2xl"
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold">{product.title}</h3>
