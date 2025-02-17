@@ -4,7 +4,7 @@ import CardProduct from "../components/CardProduct";
 import TextMarquee from "../components/button/TextMarquee";
 import TextCountUp from "../components/CountUp";
 import { WorldMap } from "../components/ui/WorldMap";
-import InfiniteScroll from "../components/infiniteScroll";
+import ScrollGsap from "../components/ScrollGsap";
 
 const Home = () => {
   return (
@@ -14,9 +14,12 @@ const Home = () => {
       <div className="mt-[10vh]">
         <TextMarquee />
       </div>
-      <section className="relative z-10">
+      {/* <section className="relative z-10">
         <InfiniteScroll />
-      </section>{" "}
+      </section>{" "} */}
+      <section className="relative z-10">
+        <ScrollGsap />
+      </section>
       <CardProduct />
       {/* <div style={{ height: "600px", position: "relative" }}>
         <CircularGallery bend={3} textColor="#ffffff" borderRadius={0.05} />
