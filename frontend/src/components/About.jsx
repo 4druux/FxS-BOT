@@ -1,117 +1,235 @@
-"use client";
-
-import { useRef, useLayoutEffect } from "react";
-import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
-import Image from "next/image";
-import Badge from "./bedge";
-import Separator from "./Separator";
-
+import { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { assets } from "../assets/assets";
+gsap.registerPlugin(ScrollTrigger);
+// Sample data
 const data = [
   {
-    imgSrc: "/assets/about/photo-1.jpg",
-    title: "Our Journey",
-    description:
-      "Founded in 2000, Zenbrew started as a small café with a vision for exceptional coffee. Now a beloved brand, we're known for quality and sustainability. Driven by passion, we create memorable coffee experiences. Join us in exploring coffee, one cup at a time.",
+    title: "Title One",
+    description: "Description for section one",
+    imgSrc: assets.logo,
   },
   {
-    imgSrc: "/assets/about/photo-2.jpg",
-    title: "Our Promise",
-    description:
-      "At Zenbrew, we promise the finest coffee with a positive impact. We source beans from sustainable farms, respecting people and the planet. Our meticulous roasting ensures a rich, satisfying experience. We are committed to quality, sustainability, and community.",
+    title: "Title Two",
+    description: "Description for section Two",
+    imgSrc: assets.logo,
   },
   {
-    imgSrc: "/assets/about/photo-3.jpg",
-    title: "Our Team",
-    description:
-      "At Zenbrew, our dedicated team is behind every great cup. Our skilled baristas and expert roasters work with passion and precision, making each coffee experience special. Meet the people who bring creativity and care to every cup and learn their unique stories.",
+    title: "Title Three",
+    description: "Description for section Three",
+    imgSrc: assets.logo,
   },
+  {
+    title: "Title Four",
+    description: "Description for section Four",
+    imgSrc: assets.logo,
+  },
+  {
+    title: "Title Five",
+    description: "Description for section Five",
+    imgSrc: assets.logo,
+  },
+  // Add more items as needed
 ];
+const InfiniteScroll = () => {
+  const containerRef = useRef(null);
+  const sliderRef = useRef(null);
 
-const About = () => {
-  const scrollableSectionRef = useRef(null);
-  const scrollableTriggerRef = useRef(null);
+  useEffect(() => {
+    const lenis = document.querySelector(".lenis");
+    let timeline;
+    let isTransitioning = false;
+    let lastDirection = null;
 
-  useLayoutEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const animation = gsap.fromTo(
-      scrollableSectionRef.current,
-      { transalteX: 0 },
-      {
-        translateX: "-200vw",
+    const smoothTransition = (action, direction) => {
+      if (isTransitioning) return;
+      if (lastDirection === direction) return;
+
+      isTransitioning = true;
+      lastDirection = direction;
+
+      // Transisi halus untuk Lenis
+      if (action === "stop") {
+        gsap.to(lenis, {
+          duration: 0.5,
+          ease: "power2.out",
+          onComplete: () => {
+            lenis?.stop();
+            setTimeout(() => {
+              isTransitioning = false;
+            }, 300);
+          },
+        });
+      } else {
+        gsap.to(lenis, {
+          duration: 0.5,
+          ease: "power2.out",
+          onComplete: () => {
+            lenis?.start();
+            setTimeout(() => {
+              isTransitioning = false;
+            }, 300);
+          },
+        });
+      }
+    };
+
+    const createAnimation = () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+
+      timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          pin: true,
+          pinSpacing: true,
+          start: "top top",
+          end: () => `+=${window.innerWidth * (data.length - 1)}`,
+          scrub: {
+            ease: "power2.inOut",
+            smoothing: 0.5,
+          },
+          anticipatePin: 1,
+          markers: {
+            startColor: "green",
+            endColor: "red",
+            fontSize: "18px",
+            indent: 20,
+          },
+          onEnter: () => {
+            smoothTransition("stop", "enter");
+          },
+          onLeave: () => {
+            smoothTransition("start", "leave");
+          },
+          onEnterBack: () => {
+            smoothTransition("stop", "enterBack");
+          },
+          onLeaveBack: () => {
+            smoothTransition("start", "leaveBack");
+          },
+          // Optimasi tambahan
+          fastScrollEnd: true,
+          preventOverlaps: true,
+          onUpdate: (self) => {
+            // Menghaluskan transisi berdasarkan progress
+            const progress = self.progress;
+            if (progress > 0.95 || progress < 0.05) {
+              gsap.to(containerRef.current, {
+                duration: 0.3,
+                ease: "power2.out",
+              });
+            }
+          },
+        },
+      });
+
+      timeline.to(sliderRef.current, {
+        x: () => -(sliderRef.current.scrollWidth - window.innerWidth),
         ease: "none",
         duration: 1,
-        scrollTrigger: {
-          trigger: scrollableTriggerRef.current,
-          start: "top top",
-          end: "1800vw top",
-          scrub: 0.6,
-          pin: true,
-        },
-      }
-    );
+      });
 
+      return timeline;
+    };
+
+    // Create initial animation
+    timeline = createAnimation();
+
+    // Debounced resize handler
+    const debounce = (func, wait) => {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    };
+
+    const handleResize = debounce(() => {
+      if (timeline) {
+        timeline.kill();
+      }
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+      timeline = createAnimation();
+      ScrollTrigger.refresh();
+    }, 250);
+
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
     return () => {
-      animation.kill();
+      if (timeline) {
+        timeline.kill();
+      }
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-
   return (
-    <section className="overflow-hidden bg-primary" id="about">
-      <div ref={scrollableTriggerRef}>
-        <div
-          ref={scrollableSectionRef}
-          className="h-screen w-[300vw] flex relative"
-        >
-          {data.map((item, index) => (
-            <div
-              key={index}
-              className="w-screen h-screen flex flex-col justify-center items-center relative"
-            >
-              <div className="container mx-auto">
-                <div className="flex gap-[30px] relative">
-                  {/* text */}
-                  <div className="flex-1 flex flex-col justify-center items-center">
-                    <Badge containerStyles="w-[180px] h-[180px]" />
-                    <div className="max-w-[560px] text-center">
-                      {/* title */}
-                      <h2 className="h2 text-white mb-4">
-                        <span className="mr-4">{item.title.split(" ")[0]}</span>
-                        <span className="text-accent">
-                          {item.title.split(" ")[1]}
-                        </span>
-                      </h2>
-                      {/* separator */}
-                      <div className="mb-8">
-                        <Separator />
-                      </div>
-                      {/* description */}
-                      <p className="leading-relaxed mb-16 px-8 xl:px-0">
-                        {item.description}
-                      </p>
-                      {/* button */}
-                      <button className="btn">See more</button>
-                    </div>
-                  </div>
-                  {/* image */}
-                  <div className="hidden xl:flex flex-1 w-full h-[70vh] relative">
-                    <Image
+    <div
+      ref={containerRef}
+      className="relative h-screen overflow-hidden bg-primary touch-none"
+    >
+      <div
+        ref={sliderRef}
+        className="absolute top-0 left-0 flex h-full will-change-transform"
+        style={{
+          width: `${data.length * 100}vw`,
+          touchAction: "none", // Mencegah default touch behavior
+        }}
+      >
+        {data.map((item, index) => (
+          <div
+            key={index}
+            className="w-screen h-screen flex items-center justify-center"
+          >
+            <div className="container mx-auto max-w-7xl px-4">
+              <div className="flex flex-col-reverse lg:flex-row gap-8 items-center">
+                {/* Text Content */}
+                <div className="content-wrapper flex-1 text-center lg:text-left">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+                    <span className="mr-4">{item.title.split(" ")[0]}</span>
+                    <span className="text-blue-500">
+                      {item.title.split(" ")[1]}
+                    </span>
+                  </h2>
+                  <p className="text-gray-300 text-lg md:text-xl mb-8 max-w-2xl mx-auto lg:mx-0">
+                    {item.description}
+                  </p>
+                  <button
+                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700
+                      text-white rounded-full transition-all duration-500
+                      transform hover:scale-105 active:scale-95
+                      hover:shadow-lg hover:shadow-blue-500/50"
+                  >
+                    See more
+                  </button>
+                </div>
+                {/* Image */}
+                <div className="image-container flex-1 w-full max-w-2xl">
+                  <div
+                    className="relative aspect-square rounded-2xl overflow-hidden
+                      shadow-2xl transform hover:scale-[1.02] transition-all duration-500
+                      hover:shadow-blue-500/20"
+                  >
+                    <img
                       src={item.imgSrc}
-                      fill
-                      className="object-cover"
-                      quality={100}
-                      priority
-                      alt=""
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      loading={index === 0 ? "eager" : "lazy"}
                     />
                   </div>
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
-
-export default About;
+export default InfiniteScroll;
