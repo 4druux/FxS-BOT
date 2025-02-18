@@ -1,219 +1,235 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { assets } from "../assets/assets";
-import { Link } from "react-router-dom";
-
 gsap.registerPlugin(ScrollTrigger);
-
-// Data items
-const itemsData = [
+// Sample data
+const data = [
   {
-    id: 1,
-    image: assets.logo_1,
-    link: "/detail/item-1",
+    title: "Title One",
+    description: "Description for section one",
+    imgSrc: assets.logo,
   },
   {
-    id: 2,
-    image: assets.logo_1,
-    link: "/detail/item-2",
+    title: "Title Two",
+    description: "Description for section Two",
+    imgSrc: assets.logo,
   },
   {
-    id: 3,
-    image: assets.logo_1,
-    link: "/detail/item-3",
+    title: "Title Three",
+    description: "Description for section Three",
+    imgSrc: assets.logo,
   },
   {
-    id: 4,
-    image: assets.logo_1,
-    link: "/detail/item-4",
+    title: "Title Four",
+    description: "Description for section Four",
+    imgSrc: assets.logo,
   },
   {
-    id: 5,
-    image: assets.logo_1,
-    link: "/detail/item-5",
+    title: "Title Five",
+    description: "Description for section Five",
+    imgSrc: assets.logo,
   },
+  // Add more items as needed
 ];
-
 const InfiniteScroll = () => {
-  const sectionRef = useRef(null);
-  const triggerRef = useRef(null);
-  // eslint-disable-next-line no-unused-vars
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const overlayRefs = useRef([]);
+  const containerRef = useRef(null);
+  const sliderRef = useRef(null);
 
   useEffect(() => {
-    let scrollTween;
+    const lenis = document.querySelector(".lenis");
+    let timeline;
+    let isTransitioning = false;
+    let lastDirection = null;
 
-    const updateScroll = () => {
-      if (scrollTween) {
-        scrollTween.kill();
-      }
+    const smoothTransition = (action, direction) => {
+      if (isTransitioning) return;
+      if (lastDirection === direction) return;
 
-      // Konfigurasi scroll yang sangat smooth dan lambat
-      scrollTween = gsap.to(sectionRef.current, {
-        x: () => `-${sectionRef.current.scrollWidth - window.innerWidth}px`,
-        ease: "power0.out", // Menggunakan easing yang lebih linear
-        scrollTrigger: {
-          trigger: triggerRef.current,
-          start: "top top",
-          end: () => `+=${sectionRef.current.scrollWidth * 2}`, // Memperpanjang area scroll
-          pin: true,
-          anticipatePin: 1,
-          scrub: 4, // Nilai yang lebih tinggi untuk scroll yang lebih lambat (1-10)
-          snap: {
-            snapTo: 1 / (itemsData.length - 1),
-            duration: { min: 1, max: 2 }, // Durasi snap yang lebih lama
-            ease: "power1.inOut",
-            delay: 0.1,
+      isTransitioning = true;
+      lastDirection = direction;
+
+      // Transisi halus untuk Lenis
+      if (action === "stop") {
+        gsap.to(lenis, {
+          duration: 0.5,
+          ease: "power2.out",
+          onComplete: () => {
+            lenis?.stop();
+            setTimeout(() => {
+              isTransitioning = false;
+            }, 300);
           },
-          onUpdate: (self) => {
-            // Efek parallax yang lebih halus
-            const progress = self.progress;
-            gsap.to(sectionRef.current.children, {
-              scale: 1 + progress * 0.03, // Efek scale yang lebih subtle
-              // rotation: progress * 6, // Rotasi sangat halus
-              duration: 2, // Durasi efek yang lebih lama
-              ease: "power1.out",
-            });
+        });
+      } else {
+        gsap.to(lenis, {
+          duration: 0.5,
+          ease: "power2.out",
+          onComplete: () => {
+            lenis?.start();
+            setTimeout(() => {
+              isTransitioning = false;
+            }, 300);
+          },
+        });
+      }
+    };
 
-            // Tambahan efek opacity untuk setiap card
-            Array.from(sectionRef.current.children).forEach((child, index) => {
-              const childProgress = Math.abs(
-                progress * itemsData.length - index
-              );
-              gsap.to(child, {
-                opacity: 1 - childProgress * 0.2,
-                duration: 1.5,
-                ease: "power1.out",
+    const createAnimation = () => {
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+
+      timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          pin: true,
+          pinSpacing: true,
+          start: "top top",
+          end: () => `+=${window.innerWidth * (data.length - 1)}`,
+          scrub: {
+            ease: "power2.inOut",
+            smoothing: 0.5,
+          },
+          anticipatePin: 1,
+          markers: {
+            startColor: "green",
+            endColor: "red",
+            fontSize: "18px",
+            indent: 20,
+          },
+          onEnter: () => {
+            smoothTransition("stop", "enter");
+          },
+          onLeave: () => {
+            smoothTransition("start", "leave");
+          },
+          onEnterBack: () => {
+            smoothTransition("stop", "enterBack");
+          },
+          onLeaveBack: () => {
+            smoothTransition("start", "leaveBack");
+          },
+          // Optimasi tambahan
+          fastScrollEnd: true,
+          preventOverlaps: true,
+          onUpdate: (self) => {
+            // Menghaluskan transisi berdasarkan progress
+            const progress = self.progress;
+            if (progress > 0.95 || progress < 0.05) {
+              gsap.to(containerRef.current, {
+                duration: 0.3,
+                ease: "power2.out",
               });
-            });
+            }
           },
         },
       });
 
-      // Smooth vertical scroll dengan efek yang lebih lambat
-      const smoothVerticalScroll = () => {
-        const currentScroll = window.pageYOffset;
-        const delta = currentScroll - (window.lastScroll || 0);
-        window.lastScroll = currentScroll;
+      timeline.to(sliderRef.current, {
+        x: () => -(sliderRef.current.scrollWidth - window.innerWidth),
+        ease: "none",
+        duration: 1,
+      });
 
-        if (Math.abs(delta) > 0) {
-          gsap.to(sectionRef.current, {
-            y: delta * 0.3, // Mengurangi amplitudo pergerakan
-            duration: 2, // Durasi yang lebih lama
-            ease: "power2.out",
-            onComplete: () => {
-              gsap.to(sectionRef.current, {
-                y: 0,
-                duration: 1.5,
-                ease: "power2.inOut",
-              });
-            },
-          });
-        }
+      return timeline;
+    };
+
+    // Create initial animation
+    timeline = createAnimation();
+
+    // Debounced resize handler
+    const debounce = (func, wait) => {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
       };
-
-      window.addEventListener("scroll", smoothVerticalScroll);
     };
 
-    updateScroll();
-
-    // Debounced resize handler dengan delay lebih lama
-    let resizeTimeout;
-    const handleResize = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(updateScroll, 300);
-    };
+    const handleResize = debounce(() => {
+      if (timeline) {
+        timeline.kill();
+      }
+      ScrollTrigger.getAll().forEach((t) => t.kill());
+      timeline = createAnimation();
+      ScrollTrigger.refresh();
+    }, 250);
 
     window.addEventListener("resize", handleResize);
 
+    // Cleanup
     return () => {
-      if (scrollTween) scrollTween.kill();
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("scroll", window.smoothVerticalScroll);
+      if (timeline) {
+        timeline.kill();
+      }
       ScrollTrigger.getAll().forEach((t) => t.kill());
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  const handleMouseEnter = (index) => {
-    setHoveredIndex(index);
-    gsap.to(overlayRefs.current[index], {
-      y: "0%",
-      duration: 0.7,
-      ease: "expo.out",
-      opacity: 1,
-    });
-  };
-
-  const handleMouseLeave = (index) => {
-    setHoveredIndex(null);
-    gsap.to(overlayRefs.current[index], {
-      y: "100%",
-      duration: 0.7,
-      ease: "expo.inOut",
-      opacity: 0.8,
-    });
-  };
-
   return (
-    <section
-      className="relative h-screen overflow-hidden bg-[#121212]"
-      ref={triggerRef}
+    <div
+      ref={containerRef}
+      className="relative h-screen overflow-hidden bg-primary touch-none"
     >
       <div
-        ref={sectionRef}
-        className="flex items-center relative h-screen space-x-8 mt-10"
+        ref={sliderRef}
+        className="absolute top-0 left-0 flex h-full will-change-transform"
         style={{
-          width: "140vw",
-          willChange: "transform",
-          transform: "translateZ(0)",
-          transition: "transform 0.5s ease-out", // Tambahan transisi default
+          width: `${data.length * 100}vw`,
+          touchAction: "none", // Mencegah default touch behavior
         }}
       >
-        {itemsData.map((item, index) => (
+        {data.map((item, index) => (
           <div
-            key={item.id}
-            className="relative w-[100%] border-2 border-neutral-800 rounded-3xl flex items-center justify-center overflow-hidden mx-auto transform-gpu"
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={() => handleMouseLeave(index)}
-            style={{
-              backfaceVisibility: "hidden",
-              perspective: 1000,
-              transition: "all 0.8s ease-out", // Transisi yang lebih lama untuk setiap card
-            }}
+            key={index}
+            className="w-screen h-screen flex items-center justify-center"
           >
-            <img
-              src={item.image}
-              className="w-full h-full object-cover brightness-90"
-              loading="lazy"
-              style={{
-                transition: "transform 1s ease-out", // Transisi lambat untuk gambar
-              }}
-            />
-            <div
-              ref={(el) => (overlayRefs.current[index] = el)}
-              className="absolute inset-0 bg-black/50 flex items-center justify-center overflow-hidden"
-              style={{
-                transform: "translateY(100%)",
-                opacity: 0.8,
-                transition: "all 1s ease-out", // Transisi overlay yang lebih lama
-              }}
-            >
-              <Link
-                to={item.link}
-                className="relative overflow-hidden px-6 py-3 rounded-full text-sm font-semibold shadow-lg transition-all duration-500 
-                bg-gradient-to-r from-gray-200 to-gray-50 text-black hover:bg-gradient-to-r hover:from-black
-                hover:to-gray-800 hover:text-white hover:border-gray-700 transform hover:scale-105 active:scale-95"
-              >
-                <span className="relative z-10">See Details</span>
-              </Link>
+            <div className="container mx-auto max-w-7xl px-4">
+              <div className="flex flex-col-reverse lg:flex-row gap-8 items-center">
+                {/* Text Content */}
+                <div className="content-wrapper flex-1 text-center lg:text-left">
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
+                    <span className="mr-4">{item.title.split(" ")[0]}</span>
+                    <span className="text-blue-500">
+                      {item.title.split(" ")[1]}
+                    </span>
+                  </h2>
+                  <p className="text-gray-300 text-lg md:text-xl mb-8 max-w-2xl mx-auto lg:mx-0">
+                    {item.description}
+                  </p>
+                  <button
+                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700
+                      text-white rounded-full transition-all duration-500
+                      transform hover:scale-105 active:scale-95
+                      hover:shadow-lg hover:shadow-blue-500/50"
+                  >
+                    See more
+                  </button>
+                </div>
+                {/* Image */}
+                <div className="image-container flex-1 w-full max-w-2xl">
+                  <div
+                    className="relative aspect-square rounded-2xl overflow-hidden
+                      shadow-2xl transform hover:scale-[1.02] transition-all duration-500
+                      hover:shadow-blue-500/20"
+                  >
+                    <img
+                      src={item.imgSrc}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                      loading={index === 0 ? "eager" : "lazy"}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 };
-
 export default InfiniteScroll;

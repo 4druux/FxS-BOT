@@ -5,13 +5,8 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
   background-color: #121212;
-  overflow-x: hidden;
 }
 
 .prata-regular {
@@ -23,24 +18,6 @@ body {
   font-family: "Manrope", sans-serif;
   font-style: normal;
   letter-spacing: 0.4rem;
-}
-
-/* Untuk memastikan scrollbar juga dark mode */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #121212;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #444;
 }
 
 @keyframes borderMove {
