@@ -4,7 +4,7 @@ import CardProduct from "../components/CardProduct";
 import TextMarquee from "../components/button/TextMarquee";
 import TextCountUp from "../components/CountUp";
 import { WorldMap } from "../components/ui/WorldMap";
-import About from "../components/about";
+import Scroll from "../components/Scroll";
 // import ScrollGsap from "../components/ScrollGsap";
 
 const Home = () => {
@@ -20,8 +20,9 @@ const Home = () => {
       </section> */}
 
       <section className="relative z-10">
-        <About />
+        <Scroll />
       </section>
+
       <CardProduct />
       {/* <div style={{ height: "600px", position: "relative" }}>
         <CircularGallery bend={3} textColor="#ffffff" borderRadius={0.05} />
