@@ -32,7 +32,7 @@ const data = [
   },
   // Add more items as needed
 ];
-const InfiniteScroll = () => {
+const About = () => {
   const containerRef = useRef(null);
   const sliderRef = useRef(null);
 
@@ -232,4 +232,4 @@ const InfiniteScroll = () => {
     </div>
   );
 };
-export default InfiniteScroll;
+export default About;
